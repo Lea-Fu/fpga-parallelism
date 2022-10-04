@@ -1,17 +1,27 @@
 #include <cstdio>
 #include "sort.hpp"
-#include <vector>
-
-using namespace std;
+#include <cstdlib>
+#include <algorithm>
 
 
 int main(void) {
 
-	arr_t<16> a = {7, 5, 3, 16, 2, 9,4, 4, 2, 87, 45, 24, 18, 91, 245, 19};
-	arr_t<16> res = sort(a);
+    arr_t<16> b;
+    std::array<int, 16> c;
+    for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 16; i++) {
+            b[i] = rand() % 100;
+            c[i] = b[i];
+        }
+        std::sort(c.begin(),c.end());
+        arr_t<16> res = sort(b);
 
-    for(int i = 0; i < 16; i++){
-        printf("%d,", res[i]);
+        for(int i = 0; i < 16; i++){
+            if(c[i] != res[i]){
+                printf("%d, %d, %d", i, res[i+1], c[i+1]); //for debugging
+                return -1;
+            }
+        }
     }
-
+    printf("everything is correct");
 }

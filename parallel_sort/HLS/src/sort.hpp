@@ -20,7 +20,7 @@ template <int size>
 arr_t<size> sort(arr_t<size> a){
 
     int tmp[2];
-    for (int i = 0; i < size/2-1 ; ++i) {
+    for (int j = 0; j < size/2 ; j++) {
 #pragma HLS PIPELINE
         for (int i = 0; i < size - 1; i+=2) {
 #pragma HLS UNROLL
@@ -31,7 +31,7 @@ arr_t<size> sort(arr_t<size> a){
                 a[i + 1] = tmp[1];
             }
         }
-        for (int i = 1; i < size-2; i+=2) {
+        for (int i = 1; i < size - 2; i+=2) {
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
                 tmp[0] = a[i + 1];

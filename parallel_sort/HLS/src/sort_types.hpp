@@ -3,8 +3,6 @@
 
 #include <vector>
 
-using namespace std;
-
 
 template <int size>
 struct arr_t {

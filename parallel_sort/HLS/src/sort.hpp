@@ -4,15 +4,14 @@
 #include "sort_types.hpp"
 #include <vector>
 
-using namespace std;
-
 
 //   size    | FF      | LUT
 // Zynq 7020 | 106.400 | 53.200
-// 6         | 580     | 1.091
-// 16        | 4.105    | 9.319
+// 6         | 773     | 1.507
+// 16        | 4.618   | 10.555
+// 32        | 17.426  | 42.077
 
-#define SORT_SIZE 16
+#define SORT_SIZE 6
 arr_t<SORT_SIZE> top_level_sort(arr_t<SORT_SIZE> a);
 
 //because this function needs a template, it can't be in the cpp file
@@ -31,6 +30,7 @@ arr_t<size> sort(arr_t<size> a){
                 a[i + 1] = tmp[1];
             }
         }
+#pragma HLS PIPELINE
         for (int i = 1; i < size - 2; i+=2) {
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
@@ -41,6 +41,7 @@ arr_t<size> sort(arr_t<size> a){
             }
         }
     }
+// this is not needed for the correct result, but for the correct pipelining of the hardware synthesis
 #pragma HLS PIPELINE
     for (int i = 0; i < size - 1; i+=2) {
 #pragma HLS UNROLL

@@ -1,6 +1,7 @@
 #ifndef SORT_HPP
 #define  SORT_HPP
 
+#include <omp.h>
 #include "sort_types.hpp"
 #include <vector>
 
@@ -21,6 +22,7 @@ arr_t<size> sort(arr_t<size> a){
     int tmp[2];
     for (int j = 0; j < size/2 ; j++) {
 #pragma HLS PIPELINE
+        #pragma omp parallel for firstprivate(tmp)
         for (int i = 0; i < size - 1; i+=2) {
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
@@ -31,6 +33,7 @@ arr_t<size> sort(arr_t<size> a){
             }
         }
 #pragma HLS PIPELINE
+        #pragma omp parallel for firstprivate(tmp)
         for (int i = 1; i < size - 2; i+=2) {
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
@@ -43,7 +46,8 @@ arr_t<size> sort(arr_t<size> a){
     }
 // this is not needed for the correct result, but for the correct pipelining of the hardware synthesis
 #pragma HLS PIPELINE
-    for (int i = 0; i < size - 1; i+=2) {
+    #pragma omp parallel for firstprivate(tmp)
+    for (int i = 0; i < size - 1; i += 2) {
 #pragma HLS UNROLL
         if (a[i] > a[i + 1]) {
             tmp[0] = a[i + 1];

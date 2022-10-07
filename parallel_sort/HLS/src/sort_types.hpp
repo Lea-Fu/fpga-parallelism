@@ -18,4 +18,11 @@ struct arr_t {
     }
 };
 
+/**
+ * start address in the memory for configuration
+ */
+struct config_t{
+    int start_address;
+};
+
 #endif

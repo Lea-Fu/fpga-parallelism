@@ -6,7 +6,7 @@
 #    include <omp.h>
 #  endif
 #endif
-
+#include <cstdio>
 #include "sort_types.hpp"
 
 
@@ -17,7 +17,7 @@
 // 32        | 17.426  | 42.077
 
 #define SORT_SIZE 6
-arr_t<SORT_SIZE> top_level_sort(arr_t<SORT_SIZE> a); //used for the hardware synthesis/ component
+void top_level_sort(int* memory, config_t config); //used for the hardware synthesis/ component
 
 //because this function needs a template, it can't be in the cpp file
 /**
@@ -33,11 +33,14 @@ arr_t<SORT_SIZE> top_level_sort(arr_t<SORT_SIZE> a); //used for the hardware syn
 template <int size>
 arr_t<size> sort(arr_t<size> a){
 
+    //printf("%d\n", omp_get_max_threads( ));
+    //printf("%d\n", omp_get_num_procs( ));
     int tmp[2];
     for (int j = 0; j < size/2 ; j++) {
 #pragma HLS PIPELINE
         #pragma omp parallel for firstprivate(tmp)
         for (int i = 0; i < size - 1; i+=2) {
+            //printf("%d\n", omp_get_thread_num());
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
                 tmp[0] = a[i + 1];

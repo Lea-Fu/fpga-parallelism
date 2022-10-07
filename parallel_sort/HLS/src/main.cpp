@@ -2,6 +2,8 @@
 #include "sort.hpp"
 #include <cstdlib>
 #include <algorithm>
+#include <array>
+
 
 /**
  * this is the main for testing if the sort algorithm is sorting the elements right

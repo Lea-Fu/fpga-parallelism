@@ -1,9 +1,13 @@
 #ifndef SORT_HPP
 #define  SORT_HPP
 
-#include <omp.h>
+#if defined __has_include
+#  if __has_include (<omp.h>)
+#    include <omp.h>
+#  endif
+#endif
+
 #include "sort_types.hpp"
-#include <vector>
 
 
 //   size    | FF      | LUT

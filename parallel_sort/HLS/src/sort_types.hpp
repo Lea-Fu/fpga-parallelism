@@ -1,7 +1,6 @@
 #ifndef SORT_TYPE_HPP
 #define  SORT_TYPE_HPP
 
-#include <vector>
 
 /**
  * this is a templated struct that defines an own type (arr_t) for the sorting elements.

@@ -13,9 +13,19 @@
 // 32        | 17.426  | 42.077
 
 #define SORT_SIZE 6
-arr_t<SORT_SIZE> top_level_sort(arr_t<SORT_SIZE> a);
+arr_t<SORT_SIZE> top_level_sort(arr_t<SORT_SIZE> a); //used for the hardware synthesis/ component
 
 //because this function needs a template, it can't be in the cpp file
+/**
+ * self-made sorting algorithm (when I say array, I mean the self-made type arr_t)
+ *
+ * #pragma HLS is needed for the hardware synthesis (so later on FPGA),
+ * #pragma omp is needed for paralleling with OpenMP (so later for CPU and Raspberry Pi)
+ *
+ * @tparam size the size of the array with the elements we want to sort
+ * @param a the input array
+ * @return the correctly sorted array
+ */
 template <int size>
 arr_t<size> sort(arr_t<size> a){
 

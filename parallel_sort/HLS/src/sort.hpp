@@ -16,8 +16,8 @@
 // 16        | 4.618   | 10.555
 // 32        | 17.426  | 42.077
 
-#define SORT_SIZE 6
-void top_level_sort(int* memory, config_t config); //used for the hardware synthesis/ component
+#define SORT_SIZE 32
+void top_level_sort(int* memory); //used for the hardware synthesis/ component
 
 //because this function needs a template, it can't be in the cpp file
 /**

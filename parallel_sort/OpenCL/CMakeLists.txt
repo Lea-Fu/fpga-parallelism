@@ -4,7 +4,7 @@ project(fpga_parallelism_opencl)
 set(CMAKE_CXX_STANDARD 17)
 include_directories(include)
 add_executable(fpga-parallelism_opencl
-        src/main.cpp
+       src/main.cpp
         )
 
 #added -framework OpenCL

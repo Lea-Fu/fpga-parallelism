@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include <array>
+#include <sys/time.h>
+#include <chrono>
+#include <iostream>
 
 
 /**
@@ -10,6 +13,11 @@
  * @return if every element is sorted correctly
  */
 int main(void) {
+
+    //clock_t t1 = clock();
+    using namespace std::literals;
+    const std::chrono::time_point<std::chrono::steady_clock> start =
+            std::chrono::steady_clock::now();
 
     //create an arr_t (own type implemented in sort_types.h) and a standard array
     arr_t<16> b;
@@ -34,6 +42,20 @@ int main(void) {
         }
     }
     //printing if it is correct
-    printf("everything is correct");
+    printf("everything is correct!\n");
+
+    printf("total time taken by CPU:\n");
+    //clock_t t2 = clock();
+    const auto end = std::chrono::steady_clock::now();
+    //long millisec = (t2 - t1) * (1000.0 / CLOCKS_PER_SEC);
+    //printf("Elapsed time: %lf milliseconds\n",
+    //       (((t2 - t1) * 1.0e3) + ((t2 - t1) / 1.0e6)));
+    //printf("time needed: %d milliseconds\n",millisec);
+    std::cout
+            << "Calculations took: "
+            << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "µs = "
+            << (end - start) / 1ms << "ms = "
+            << (end - start) / 1s << "s.\n";
+
     return 0;
 }

@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <chrono>
+#include <iostream>
 
 
 #define SORT_SIZE 32
@@ -41,6 +43,9 @@ const char *KernelSource =
 
 
 int main(void) {
+
+    using namespace std::literals;
+
     int i;
     float *a = (float*)malloc(sizeof(float) * SORT_SIZE);
     //create "random" numbers to sort
@@ -91,7 +96,7 @@ int main(void) {
     //create compute context
     context = clCreateContext( NULL, num_devices, device_list, NULL, NULL, &clStatus);
     //create a command queue
-    cl_command_queue command_queue = clCreateCommandQueue(context, device_list[0], 0, &clStatus);
+    cl_command_queue command_queue = clCreateCommandQueue(context, device_list[0], CL_QUEUE_PROFILING_ENABLE, &clStatus);
     //create memory buffers on the device
     cl_mem A_clmem = clCreateBuffer(context, CL_MEM_READ_ONLY, SORT_SIZE * sizeof(float), NULL, &clStatus);
     //write our data set into the input array in device memory
@@ -112,14 +117,35 @@ int main(void) {
     //execute the kernel
     size_t global_size = SORT_SIZE/2;
     size_t local_size = 16;
+    cl_event event1;
+    cl_event event2;
+    cl_ulong time_start1;
+    cl_ulong time_end1;
+    cl_ulong time_start2;
+    cl_ulong time_end2;
+    cl_ulong time = 0;
+
+    const std::chrono::time_point<std::chrono::steady_clock> start =
+            std::chrono::steady_clock::now();
+
     for (int j = 0; j < SORT_SIZE/2; ++j) {
         int offset = 0;
         clSetKernelArg(kernel, 1, sizeof(unsigned int), &offset);
-        clStatus = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL);
+        clStatus = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, &event1);
+        clWaitForEvents(1, &event1);
+        clGetEventProfilingInfo(event1, CL_PROFILING_COMMAND_START, sizeof(time_start1), &time_start1, NULL);
+        clGetEventProfilingInfo(event1, CL_PROFILING_COMMAND_END, sizeof(time_end1), &time_end1, NULL);
+        time += time_end1-time_start1;
         offset = 1;
         clSetKernelArg(kernel, 1, sizeof(unsigned int), &offset);
-        clStatus = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL);
+        clStatus = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, &event2);
+        clWaitForEvents(1, &event2);
+        clGetEventProfilingInfo(event2, CL_PROFILING_COMMAND_START, sizeof(time_start2), &time_start2, NULL);
+        clGetEventProfilingInfo(event2, CL_PROFILING_COMMAND_END, sizeof(time_end2), &time_end2, NULL);
+        time += time_end2-time_start2;
     }
+
+    const auto end = std::chrono::steady_clock::now();
 
     //read back the results (A_clmem) from the device to verify the output (a)
     clStatus = clEnqueueReadBuffer(command_queue, A_clmem, CL_TRUE, 0, SORT_SIZE * sizeof(float), a, 0, NULL, NULL);
@@ -129,6 +155,18 @@ int main(void) {
     //display result
     for(i = 0; i < SORT_SIZE; i++)
         printf("%f\n", a[i]);
+
+    double nanoSeconds = time;
+    printf("OpenCl execution time: %0.4f milliseconds \n",nanoSeconds / 1000000.0); //just the execution time from all the kernels accumulated
+
+    printf("total time taken by GPU:\n");
+    //time just for the algorithm measured, without the time for compiling but with time from the for loop
+    std::cout
+            << "Calculations took: "
+            << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "µs = "
+            << (end - start) / 1ms << "ms = "
+            << (end - start) / 1s << "s.\n";
+
     //release all OpenCL allocated objects and host buffers
     clStatus = clReleaseKernel(kernel);
     clStatus = clReleaseProgram(program);

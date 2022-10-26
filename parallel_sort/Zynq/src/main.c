@@ -5,15 +5,15 @@
 #include <stdio.h>
 #include "platform.h"
 #include "xil_printf.h"
-#include "xtime_l.h"
+#include <xtmrctr.h>
 
 //#define TIME_CONST (1.0/(667000000.0/2.0)) //667MHz ARM Core Clock
 
 int main()
 {
-	uint32_t test_time;
-	XTime gbl_time_before_test;
-	XTime gbl_time_after_test;
+	XTmrCtr timer;
+	u32 time = 0;
+	XTmrCtr_Initialize(&timer, XPAR_AXI_TIMER_0_DEVICE_ID);
 
     init_platform();
     Xil_DCacheDisable();
@@ -37,14 +37,12 @@ int main()
 
     //wait till the hardware is ready
     while(!XTop_level_sort_IsReady(&sort_inst));
-    XTime_SetTime(0);
-    XTime_GetTime(&gbl_time_before_test);
-    //for(int i = 0; i < 10000000; i++); to test/prrof that the timer doesn't work properly
+    XTmrCtr_Start(&timer, 0x0);
 	//start sorting
 	XTop_level_sort_Start(&sort_inst);
 	//sorting is finished
 	while(!XTop_level_sort_IsDone(&sort_inst));
-	XTime_GetTime(&gbl_time_after_test);
+	XTmrCtr_Stop(&timer, 0x0);
 
     //don't use, when cache is disabled
     //Xil_DCacheInvalidate(); //mark cache lines as invalidate (so now read from main mem)
@@ -55,10 +53,11 @@ int main()
     }
     print("\n\r");
 
-    test_time = (u64)gbl_time_after_test - (u64)gbl_time_before_test;
-    print("just sorting time: ");
-    printf("%lld microseconds", (long long)(1000000*test_time*1.0/COUNTS_PER_SECOND)); //*TIME_CONST);
+    time = XTmrCtr_GetValue(&timer, 0x0);
+    xil_printf("AXI Timer: %d cycles, ", time);
+    xil_printf("AXI Timer: %d nanoseconds", time*10);
     print("\n\r");
+    XTmrCtr_SetResetValue(&timer, 0x0, 0);
 
     cleanup_platform();
     return 0;

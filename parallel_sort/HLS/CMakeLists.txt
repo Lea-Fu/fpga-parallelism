@@ -9,8 +9,9 @@ include_directories(include)
 add_executable(fpga-parallelism
         src/main.cpp
         src/sort.hpp
+        src/sort2.hpp
         src/sort_types.hpp
-        src/sort.cpp)
+        src/sort.cpp src/sort2.cpp)
 
 enable_testing()
 add_test(NAME SortTest COMMAND fpga-parallelism)

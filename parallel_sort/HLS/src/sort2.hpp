@@ -1,5 +1,5 @@
-#ifndef SORT_HPP
-#define  SORT_HPP
+#ifndef SORT2_HPP
+#define  SORT2_HPP
 
 #if defined __has_include
 #  if __has_include (<omp.h>)
@@ -52,12 +52,18 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         while (left < mergeSize && right < mergeSize*2) {
 #pragma HLS UNROLL
             if (sortLevels[left][level] <= sortLevels[right][level]) {
-                sortLevels[dest++][level+1] = sortLevels[left][level];
+                sortLevels[dest++][level + 1] = sortLevels[left][level];
                 left++;
             } else {
-                sortLevels[dest++][level+1] = sortLevels[right][level];
+                sortLevels[dest++][level + 1] = sortLevels[right][level];
                 right++;
             }
+        }
+        while (left+mergeSize > right) {
+            sortLevels[dest++][level+1] = sortLevels[right++][level];
+        }
+        while (left+mergeSize < right) {
+            sortLevels[dest++][level+1] = sortLevels[left++][level];
         }
         readyLeft[level] = false;
         readyRight[level] = false;
@@ -100,6 +106,12 @@ void sort2(arr_t<MemBusSize> *a){
 #pragma HLS PIPELINE
             merge<MemBusSize,SortSize>(sortLevels, readyLeft, readyRight, k);
         }
+    }
+
+    //write sorted result back into the memory
+    for (int i = 0; i < SORT_SIZE; i+=2) {
+        a[i][0] = sortLevels[i][log2(SortSize)];
+        a[i][1] = sortLevels[i+1][log2(SortSize)];
     }
 }
 

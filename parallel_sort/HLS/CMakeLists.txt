@@ -11,7 +11,8 @@ add_executable(fpga-parallelism
         src/sort.hpp
         src/sort2.hpp
         src/sort_types.hpp
-        src/sort.cpp src/sort2.cpp)
+        src/sort.cpp
+        src/sort2.cpp)
 
 enable_testing()
 add_test(NAME SortTest COMMAND fpga-parallelism)

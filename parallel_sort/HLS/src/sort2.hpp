@@ -35,7 +35,7 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
  * @param level level that we are in (at the pyramid) to sort
  */
 template <int MemBusSize,int SortSize>
-void merge(int sortLevels[SortSize][log2(SortSize)], bool readyLeft[log2(SortSize)], bool readyRight[log2(SortSize)], int level){
+void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level){
     if (readyLeft[level] && readyRight[level]) {
         int mergeSize = 1<<level; //pow(2, level);
 
@@ -82,8 +82,8 @@ void sort2(arr_t<MemBusSize> *a){
     int sortLevels[SortSize][log2(SortSize)+1] = {};
 
     //readyFlag
-    bool readyLeft[log2(SortSize)] = {false};
-    bool readyRight[log2(SortSize)] = {false};
+    bool readyLeft[log2(SortSize)+1] = {false};
+    bool readyRight[log2(SortSize)+1] = {false};
 
     //top to bottom
     for (int i = 0; i < SortSize/2 ; i++) {

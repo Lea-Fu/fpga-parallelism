@@ -31,7 +31,7 @@ int sort1_test() {
         //printing if something is incorrect
         for(int i = 0; i < 16; i++){
             if(c[i] != res[i]){
-                printf("%d, %d, %d", i, res[i+1], c[i+1]); //for debugging
+                printf("for debugging: %d, %d, %d", i, res[i+1], c[i+1]); //for debugging
                 return -1;
             }
         }
@@ -81,11 +81,11 @@ int sort2_test() {
         //printing if something is incorrect
         for(int i = 0; i < 16; i++){
             if(c[i*2] != memory[i][0]){
-                printf("%d, %d, %d", i, memory[i][0], c[i*2]); //for debugging
+                printf("for debugging: %d, %d, %d", i, memory[i][0], c[i*2]); //for debugging
                 return -1;
             }
             if(c[i*2+1] != memory[i][1]){
-                printf("%d, %d, %d", i, memory[i][1], c[i*2+1]); //for debugging
+                printf("for debugging: %d, %d, %d", i, memory[i][1], c[i*2+1]); //for debugging
                 return -1;
             }
         }
@@ -116,9 +116,9 @@ int main(void) {
     }
 
     result = sort2_test();
-    //if (result) {
-    //    return result;
-    //}
+    if (result) {
+        return result;
+    }
 
     return 0;
 }

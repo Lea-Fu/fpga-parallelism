@@ -18,7 +18,7 @@
 
 //needed because we need the log2 at compile time
 constexpr  size_t log2(size_t n) {
-    return ((n<2)?1: 1+log2(n/2));
+    return ((n<2)?0: 1+log2(n/2));
 }
 
 #define MEM_BUS_SIZE 2
@@ -52,10 +52,10 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         while (left < mergeSize && right < mergeSize*2) {
 #pragma HLS UNROLL
             if (sortLevels[left][level] <= sortLevels[right][level]) {
-                sortLevels[dest++][level + 1] = sortLevels[left][level];
+                sortLevels[dest++][level+1] = sortLevels[left][level];
                 left++;
             } else {
-                sortLevels[dest++][level + 1] = sortLevels[right][level];
+                sortLevels[dest++][level+1] = sortLevels[right][level];
                 right++;
             }
         }
@@ -109,9 +109,9 @@ void sort2(arr_t<MemBusSize> *a){
     }
 
     //write sorted result back into the memory
-    for (int i = 0; i < SORT_SIZE; i+=2) {
-        a[i][0] = sortLevels[i][log2(SortSize)];
-        a[i][1] = sortLevels[i+1][log2(SortSize)];
+    for (int i = 0; i < SORT_SIZE/2; i++) {
+        a[i][0] = sortLevels[i*2][log2(SortSize)];
+        a[i][1] = sortLevels[i*2+1][log2(SortSize)];
     }
 }
 

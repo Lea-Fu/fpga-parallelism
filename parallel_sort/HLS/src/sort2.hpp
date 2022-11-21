@@ -8,6 +8,7 @@
 #endif
 #include <cstdio>
 #include "sort_types.hpp"
+#include <limits.h>
 
 
 //   size    | FF      | LUT
@@ -17,9 +18,17 @@
 // 32        |         |
 
 //needed because we need the log2 at compile time
-constexpr  size_t log2(size_t n) {
-    return ((n<2)?0: 1+log2(n/2));
+constexpr size_t log2 (size_t val) {
+    if (val == 0) return UINT_MAX;
+    if (val == 1) return 0;
+    unsigned int res = 0;
+    while (val > 1) {
+        val >>= 1;
+        res++;
+    }
+    return res;
 }
+
 
 #define MEM_BUS_SIZE 2
 #define SORT_SIZE 32

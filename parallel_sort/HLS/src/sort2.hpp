@@ -29,7 +29,6 @@ constexpr size_t log2 (size_t val) {
     return res;
 }
 
-
 #define MEM_BUS_SIZE 2
 #define SORT_SIZE 32
 void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synthesis/ component
@@ -45,8 +44,9 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
  */
 template <int MemBusSize,int SortSize>
 void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level){
+#pragma HLS INLINE
     if (readyLeft[level] && readyRight[level]) {
-        int mergeSize = 1<<level; //pow(2, level);
+        const int mergeSize = 1<<level; //pow(2, level);
 
         int left = 0;
         int right = mergeSize;
@@ -58,8 +58,8 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         } else {
             readyLeft[level+1] = true;
         }
-        while (left < mergeSize && right < mergeSize*2) {
-#pragma HLS UNROLL
+        while (left < mergeSize && right < mergeSize*2) { //TODO: variable sized loop bounds aren't compatible with UNROLL
+//#pragma HLS UNROLL
             if (sortLevels[left][level] <= sortLevels[right][level]) {
                 sortLevels[dest++][level+1] = sortLevels[left][level];
                 left++;
@@ -69,9 +69,11 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
             }
         }
         while (left+mergeSize > right) {
+//#pragma HLS UNROLL
             sortLevels[dest++][level+1] = sortLevels[right++][level];
         }
         while (left+mergeSize < right) {
+//#pragma HLS UNROLL
             sortLevels[dest++][level+1] = sortLevels[left++][level];
         }
         readyLeft[level] = false;
@@ -100,8 +102,10 @@ void sort2(arr_t<MemBusSize> *a){
     bool readyLeft[log2(SortSize)+1] = {false};
     bool readyRight[log2(SortSize)+1] = {false};
 
+
     //top to bottom
     for (int i = 0; i < SortSize/2 ; i++) {
+#pragma HLS loop_flatten off
         //get input from MemBus
         arr_t<MemBusSize> input = a[i];
 
@@ -111,8 +115,9 @@ void sort2(arr_t<MemBusSize> *a){
         readyRight[0] = true;
 
         //merge
-        for (int k = 0; k < log2(SortSize); k++) {
 #pragma HLS PIPELINE
+        for (int k = 0; k < log2(SortSize); k++) {
+//#pragma HLS UNROLL
             merge<MemBusSize,SortSize>(sortLevels, readyLeft, readyRight, k);
         }
     }

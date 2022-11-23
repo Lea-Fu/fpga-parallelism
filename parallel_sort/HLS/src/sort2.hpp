@@ -9,6 +9,7 @@
 #include <cstdio>
 #include "sort_types.hpp"
 #include <limits.h>
+#include <assert.h>
 
 
 //   size    | FF      | LUT
@@ -58,8 +59,12 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         } else {
             readyLeft[level+1] = true;
         }
+        //the assert macro in C/C++ is supported for synthesis when used to assert range information
+        //https://docs.xilinx.com/r/2021.1-English/ug1399-vitis-hls/Assertions
+        //assert(mergeSize<=SortSize/2);
         while (left < mergeSize && right < mergeSize*2) { //TODO: variable sized loop bounds aren't compatible with UNROLL
-//#pragma HLS UNROLL
+#pragma HLS UNROLL
+//#pragma HLS loop_tripcount min=1 max=16
             if (sortLevels[left][level] <= sortLevels[right][level]) {
                 sortLevels[dest++][level+1] = sortLevels[left][level];
                 left++;
@@ -68,12 +73,18 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
                 right++;
             }
         }
+        //assert(left<=SortSize/2);
         while (left+mergeSize > right) {
-//#pragma HLS UNROLL
+            //assert(right<=SortSize);
+#pragma HLS UNROLL
+//#pragma HLS loop_tripcount min=1 max=16
             sortLevels[dest++][level+1] = sortLevels[right++][level];
         }
+        //assert(right<=SortSize);
         while (left+mergeSize < right) {
-//#pragma HLS UNROLL
+            //assert(left<=SortSize/2);
+#pragma HLS UNROLL
+//#pragma HLS loop_tripcount min=1 max=16
             sortLevels[dest++][level+1] = sortLevels[left++][level];
         }
         readyLeft[level] = false;
@@ -117,7 +128,7 @@ void sort2(arr_t<MemBusSize> *a){
         //merge
 #pragma HLS PIPELINE
         for (int k = 0; k < log2(SortSize); k++) {
-//#pragma HLS UNROLL
+#pragma HLS UNROLL
             merge<MemBusSize,SortSize>(sortLevels, readyLeft, readyRight, k);
         }
     }

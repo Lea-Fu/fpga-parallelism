@@ -16,7 +16,7 @@
 // Zynq 7020 | 106.400 | 53.200
 // 6         |         |
 // 16        |         |
-// 32        |         |
+// 32        |  2.783  | 4.473
 
 //needed because we need the log2 at compile time
 constexpr size_t log2 (size_t val) {
@@ -63,7 +63,7 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         //https://docs.xilinx.com/r/2021.1-English/ug1399-vitis-hls/Assertions
         //assert(mergeSize<=SortSize/2);
         while (left < mergeSize && right < mergeSize*2) { //TODO: variable sized loop bounds aren't compatible with UNROLL
-#pragma HLS UNROLL
+//#pragma HLS UNROLL
 //#pragma HLS loop_tripcount min=1 max=16
             if (sortLevels[left][level] <= sortLevels[right][level]) {
                 sortLevels[dest++][level+1] = sortLevels[left][level];
@@ -76,14 +76,14 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         //assert(left<=SortSize/2);
         while (left+mergeSize > right) {
             //assert(right<=SortSize);
-#pragma HLS UNROLL
+//#pragma HLS UNROLL
 //#pragma HLS loop_tripcount min=1 max=16
             sortLevels[dest++][level+1] = sortLevels[right++][level];
         }
         //assert(right<=SortSize);
         while (left+mergeSize < right) {
             //assert(left<=SortSize/2);
-#pragma HLS UNROLL
+//#pragma HLS UNROLL
 //#pragma HLS loop_tripcount min=1 max=16
             sortLevels[dest++][level+1] = sortLevels[left++][level];
         }
@@ -109,6 +109,8 @@ void sort2(arr_t<MemBusSize> *a){
     //half pyramid (plus one level for the end result)
     int sortLevels[SortSize][log2(SortSize)+1] = {};
 
+//#pragma HLS STREAM variable=sortLevels dim=2
+
     //readyFlag
     bool readyLeft[log2(SortSize)+1] = {false};
     bool readyRight[log2(SortSize)+1] = {false};
@@ -126,14 +128,16 @@ void sort2(arr_t<MemBusSize> *a){
         readyRight[0] = true;
 
         //merge
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
         for (int k = 0; k < log2(SortSize); k++) {
-#pragma HLS UNROLL
+//#pragma HLS PIPELINE
+//#pragma HLS UNROLL
             merge<MemBusSize,SortSize>(sortLevels, readyLeft, readyRight, k);
         }
     }
 
     //write sorted result back into the memory
+#pragma HLS pipeline off
     for (int i = 0; i < SORT_SIZE/2; i++) {
         a[i][0] = sortLevels[i*2][log2(SortSize)];
         a[i][1] = sortLevels[i*2+1][log2(SortSize)];

@@ -36,8 +36,8 @@ use of OpenMP.
 
 4. Vitis
 
-       1. Modify BSP Settings... --> standalone --> stdin --> ps7_uart_1
-          --> stdout --> ps7_uart_1
-       2. File --> New --> Application Project... --> Add
+       1. File --> New --> Application Project... --> Add
           --> Create new platform from hardware (XSA) --> Browse...
           --> Empty Application(C) --> write Code for FPGA here
+       2. Modify BSP Settings... --> standalone --> stdin --> ps7_uart_1
+         --> stdout --> ps7_uart_1

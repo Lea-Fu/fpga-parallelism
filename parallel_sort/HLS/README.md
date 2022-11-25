@@ -41,3 +41,9 @@ use of OpenMP.
           --> Empty Application(C) --> write Code for FPGA here
        2. Modify BSP Settings... --> standalone --> stdin --> ps7_uart_1
          --> stdout --> ps7_uart_1
+       3. Playbutton --> Run Configurations... --> Single Application Debug --> Target Setup
+          --> !Reset Entire System --> !program FPGA --> check bitstream file --> Apply
+       4. connect real FPGA to your computer
+       5. Xilinx --> Program Device --> Program
+       6. Console Plus Symbole --> 4 Command Shell Console
+       7. Playbutton --> 1 Debugger_fpga_parallelism_vitis_(default)

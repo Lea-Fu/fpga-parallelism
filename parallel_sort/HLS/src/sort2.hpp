@@ -11,6 +11,7 @@
 #include <limits.h>
 #include <assert.h>
 
+//TODO: bitonic mergesort
 
 //   size    | FF      | LUT
 // Zynq 7020 | 106.400 | 53.200
@@ -44,24 +45,24 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
  * @param level level that we are in (at the pyramid) to sort
  */
 template <int MemBusSize,int SortSize>
-void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level){
+void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level) {
 #pragma HLS PIPELINE
     if (readyLeft[level] && readyRight[level]) {
-        const int mergeSize = 1<<level; //pow(2, level);
+        const int mergeSize = 1 << level; //pow(2, level);
 
-        int left = 0;
-        int right = mergeSize;
+        //int left = 0;
+        //int right = mergeSize;
         int dest = 0;
         //check if we have to write into left or right
-        if (readyLeft[level+1]) {
-            dest += mergeSize*2;
-            readyRight[level+1] = true;
+        if (readyLeft[level + 1]) {
+            dest += mergeSize * 2;
+            readyRight[level + 1] = true;
         } else {
-            readyLeft[level+1] = true;
+            readyLeft[level + 1] = true;
         }
 
 /*
-        //TODO: Unable to enforce a carried dependence constraint (https://www.xilinx.com/htmldocs/xilinx2022_1/hls-guidance/200-880.html)
+        //Unable to enforce a carried dependence constraint (https://www.xilinx.com/htmldocs/xilinx2022_1/hls-guidance/200-880.html)
         for (int i = 0; i < SortSize; i++) {
 //#pragma HLS UNROLL
             if (left < mergeSize && right < mergeSize*2) {
@@ -90,7 +91,7 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
 */
 
 
-
+/*
         while (left < mergeSize && right < mergeSize*2) { //variable sized loop bounds aren't compatible with UNROLL
             if (sortLevels[left][level] <= sortLevels[right][level]) {
                 sortLevels[dest++][level+1] = sortLevels[left][level];
@@ -108,8 +109,50 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         }
         readyLeft[level] = false;
         readyRight[level] = false;
+        */
+
+
+        int tmpBitonic1[mergeSize*2];
+        int tmpBitonic2[mergeSize*2];
+
+        for (int i = 0; i < mergeSize; i++) {
+            if (sortLevels[i][level] < sortLevels[mergeSize*2-i-1][level]) {
+                tmpBitonic2[i] = sortLevels[i][level];
+                tmpBitonic2[mergeSize*2-i-1] = sortLevels[mergeSize*2-i-1][level];
+            } else {
+                tmpBitonic2[i] = sortLevels[mergeSize*2-i-1][level];
+                tmpBitonic2[mergeSize*2-i-1] = sortLevels[i][level];
+            }
+        }
+
+        for (int i = 0, d=mergeSize/2, n = mergeSize; i < level; i++, n/=2, d/=2) {
+            for (int m = 0; m < mergeSize * 2; m++) {
+                tmpBitonic1[m] = tmpBitonic2[m];
+            }
+            for (int j = 0, o = 0; j < 2<<i; j++, o += n) {
+                for (int k = d, l = 0; k > 0; k--, l++) {
+                    if (tmpBitonic1[o+l] < tmpBitonic1[o+l+d]) {
+                        tmpBitonic2[o+l] = tmpBitonic1[o+l];
+                        tmpBitonic2[o+l+d] = tmpBitonic1[o+l+d];
+                    } else {
+                        tmpBitonic2[o+l] = tmpBitonic1[o+l+d];
+                        tmpBitonic2[o+l+d] = tmpBitonic1[o+l];
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < mergeSize * 2; i++) {
+            sortLevels[dest+i][level+1] = tmpBitonic2[i];
+        }
+
+        readyLeft[level] = false;
+        readyRight[level] = false;
+
     }
 }
+
+
 
 //because this function needs a template, it can't be in the cpp file
 /**
@@ -137,8 +180,6 @@ void sort2(arr_t<MemBusSize> *a){
 
     //half pyramid (plus one level for the end result)
     int sortLevels[SortSize][log2(SortSize)+1] = {};
-
-//#pragma HLS STREAM variable=sortLevels dim=2
 
     //readyFlag
     bool readyLeft[log2(SortSize)+1] = {false};

@@ -45,7 +45,7 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
  */
 template <int MemBusSize,int SortSize>
 void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level){
-#pragma HLS INLINE
+#pragma HLS PIPELINE
     if (readyLeft[level] && readyRight[level]) {
         const int mergeSize = 1<<level; //pow(2, level);
 
@@ -59,12 +59,39 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
         } else {
             readyLeft[level+1] = true;
         }
-        //the assert macro in C/C++ is supported for synthesis when used to assert range information
-        //https://docs.xilinx.com/r/2021.1-English/ug1399-vitis-hls/Assertions
-        //assert(mergeSize<=SortSize/2);
-        while (left < mergeSize && right < mergeSize*2) { //TODO: variable sized loop bounds aren't compatible with UNROLL
+
+/*
+        //TODO: Unable to enforce a carried dependence constraint (https://www.xilinx.com/htmldocs/xilinx2022_1/hls-guidance/200-880.html)
+        for (int i = 0; i < SortSize; i++) {
 //#pragma HLS UNROLL
-//#pragma HLS loop_tripcount min=1 max=16
+            if (left < mergeSize && right < mergeSize*2) {
+                if (sortLevels[left][level] <= sortLevels[right][level]) {
+                    sortLevels[dest++][level+1] = sortLevels[left][level];
+                    left++;
+                } else {
+                    sortLevels[dest++][level+1] = sortLevels[right][level];
+                    right++;
+                }
+            }
+        }
+
+        for (int i = 0; i < SortSize; i++) {
+//#pragma HLS UNROLL
+            if (left+mergeSize > right) {
+                sortLevels[dest++][level+1] = sortLevels[right++][level];
+            }
+        }
+        for (int i = 0; i < SortSize; i++) {
+//#pragma HLS UNROLL
+            if (left+mergeSize < right) {
+                sortLevels[dest++][level+1] = sortLevels[left++][level];
+            }
+        }
+*/
+
+
+
+        while (left < mergeSize && right < mergeSize*2) { //variable sized loop bounds aren't compatible with UNROLL
             if (sortLevels[left][level] <= sortLevels[right][level]) {
                 sortLevels[dest++][level+1] = sortLevels[left][level];
                 left++;
@@ -73,18 +100,10 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
                 right++;
             }
         }
-        //assert(left<=SortSize/2);
         while (left+mergeSize > right) {
-            //assert(right<=SortSize);
-//#pragma HLS UNROLL
-//#pragma HLS loop_tripcount min=1 max=16
             sortLevels[dest++][level+1] = sortLevels[right++][level];
         }
-        //assert(right<=SortSize);
         while (left+mergeSize < right) {
-            //assert(left<=SortSize/2);
-//#pragma HLS UNROLL
-//#pragma HLS loop_tripcount min=1 max=16
             sortLevels[dest++][level+1] = sortLevels[left++][level];
         }
         readyLeft[level] = false;
@@ -105,6 +124,16 @@ void merge(int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortS
  */
 template <int MemBusSize,int SortSize>
 void sort2(arr_t<MemBusSize> *a){
+#pragma HLS pipeline off
+
+    /*
+    arr_t<SortSize> input;
+    //get whole input from MemBus
+    for (int i = 0; i < SortSize/2 ; i++) {
+        input[i*2] = a[i][0];
+        input[i*2+1] = a[i][1];
+    }
+     */
 
     //half pyramid (plus one level for the end result)
     int sortLevels[SortSize][log2(SortSize)+1] = {};
@@ -118,27 +147,22 @@ void sort2(arr_t<MemBusSize> *a){
 
     //top to bottom
     for (int i = 0; i < SortSize/2 ; i++) {
-#pragma HLS loop_flatten off
-        //get input from MemBus
-        arr_t<MemBusSize> input = a[i];
+        arr_t<MemBusSize> input = a[i]; //
 
-        sortLevels[0][0] = input[0]; //left
+        sortLevels[0][0] = input[0]; //[i*2]; //left
         readyLeft[0] = true;
-        sortLevels[1][0] = input[1]; //right
+        sortLevels[1][0] = input[1]; //[i*2+1]; //right
         readyRight[0] = true;
 
         //merge
-//#pragma HLS PIPELINE
         for (int k = 0; k < log2(SortSize); k++) {
-//#pragma HLS PIPELINE
-//#pragma HLS UNROLL
+#pragma HLS PIPELINE
             merge<MemBusSize,SortSize>(sortLevels, readyLeft, readyRight, k);
         }
     }
 
     //write sorted result back into the memory
-#pragma HLS pipeline off
-    for (int i = 0; i < SORT_SIZE/2; i++) {
+    for (int i = 0; i < SortSize/2; i++) {
         a[i][0] = sortLevels[i*2][log2(SortSize)];
         a[i][1] = sortLevels[i*2+1][log2(SortSize)];
     }

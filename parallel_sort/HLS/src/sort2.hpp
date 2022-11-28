@@ -45,7 +45,7 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
  * @param level level that we are in (at the pyramid) to sort
  */
 template <int MemBusSize,int SortSize>
-arr_t<SortSize> merge(arr_t<MemBusSize> input, bool reset) { //int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level) {
+arr_t<SortSize> merge(arr_t<MemBusSize> input) {
 #pragma HLS PIPELINE
 
     //half pyramid (plus one level for the end result)
@@ -132,15 +132,8 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input, bool reset) { //int sortLevels[So
     for (int i = 0; i < SortSize; i++) {
         sorted[i] = sortLevels[i][log2(SortSize)];
     }
-    if(reset){
-        for (int i = 0; i < log2(SortSize)+1; i++) {
-            readyLeft[i] = false;
-            readyRight[i] = false;
-            for (int j = 0; j < SortSize; j++) {
-                sortLevels[i][j] = 0;
-            }
-        }
-    }
+
+    readyLeft[log2(SortSize)] = false; //reset
     return sorted;
 }
 
@@ -159,23 +152,20 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input, bool reset) { //int sortLevels[So
  */
 template <int MemBusSize,int SortSize>
 void sort2(arr_t<MemBusSize> *a) {
-#pragma HLS DATAFLOW //pipeline off
+#pragma HLS DATAFLOW
 
     arr_t<SortSize> sorted;
+#pragma HLS ARRAY_PARTITION variable=sorted complete dim=1
     //store each element in merge function
     for (int i = 0; i < SortSize/2; i++) {
+//#pragma HLS PIPELINE OFF
         arr_t<MemBusSize> input = a[i];
-
-        bool reset = false;
-        if(i == SortSize/2-1) {
-            reset = true;
-        }
-
-        sorted = merge<MemBusSize, SortSize>(input, reset);
+        sorted = merge<MemBusSize, SortSize>(input);
     }
 
     //write sorted result back into the memory
     for (int i = 0; i < SortSize/2; i++) {
+#pragma HLS PIPELINE OFF
         a[i][0] = sorted[i*2];//[log2(SortSize)];
         a[i][1] = sorted[i*2+1]; //[log2(SortSize)];
     }

@@ -45,15 +45,18 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
  * @param level level that we are in (at the pyramid) to sort
  */
 template <int MemBusSize,int SortSize>
-arr_t<SortSize> merge(arr_t<MemBusSize> input) { //int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level) {
+arr_t<SortSize> merge(arr_t<MemBusSize> input, bool reset) { //int sortLevels[SortSize][log2(SortSize)+1], bool readyLeft[log2(SortSize)+1], bool readyRight[log2(SortSize)+1], int level) {
 #pragma HLS PIPELINE
 
     //half pyramid (plus one level for the end result)
-    static int sortLevels[SortSize][log2(SortSize) + 1] = {}; //TODO: reset
+    static int sortLevels[SortSize][log2(SortSize) + 1] = {};
+#pragma HLS RESET VARIABLE=sortLevels
 
     //readyFlag
-    static bool readyLeft[log2(SortSize) + 1] = {false}; //TODO: reset
-    static bool readyRight[log2(SortSize) + 1] = {false}; //TODO: reset
+    static bool readyLeft[log2(SortSize) + 1] = {false};
+    static bool readyRight[log2(SortSize) + 1] = {false};
+#pragma HLS RESET VARIABLE=readyLeft
+#pragma HLS RESET VARIABLE=readyRight
 
     arr_t<SortSize> sorted;
 
@@ -129,6 +132,15 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) { //int sortLevels[SortSize][log2
     for (int i = 0; i < SortSize; i++) {
         sorted[i] = sortLevels[i][log2(SortSize)];
     }
+    if(reset){
+        for (int i = 0; i < log2(SortSize)+1; i++) {
+            readyLeft[i] = false;
+            readyRight[i] = false;
+            for (int j = 0; j < SortSize; j++) {
+                sortLevels[i][j] = 0;
+            }
+        }
+    }
     return sorted;
 }
 
@@ -153,7 +165,13 @@ void sort2(arr_t<MemBusSize> *a) {
     //store each element in merge function
     for (int i = 0; i < SortSize/2; i++) {
         arr_t<MemBusSize> input = a[i];
-        sorted = merge<MemBusSize, SortSize>(input);
+
+        bool reset = false;
+        if(i == SortSize/2-1) {
+            reset = true;
+        }
+
+        sorted = merge<MemBusSize, SortSize>(input, reset);
     }
 
     //write sorted result back into the memory

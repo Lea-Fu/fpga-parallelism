@@ -19,9 +19,9 @@ int sort1_test() {
     std::array<int, 16> c;
     //filling the arrays with random numbers between 0 and 99
     for (int i = 0; i < 100; i++) {
-        for (int i = 0; i < 16; i++) {
-            b[i] = rand() % 100;
-            c[i] = b[i];
+        for (int j = 0; j < 16; j++) {
+            b[j] = rand() % 100;
+            c[j] = b[j];
         }
         //sort them with the standard sort for checking if our own sort is working right
         std::sort(c.begin(),c.end());
@@ -29,9 +29,9 @@ int sort1_test() {
         arr_t<16> res = sort(b);
 
         //printing if something is incorrect
-        for(int i = 0; i < 16; i++){
-            if(c[i] != res[i]){
-                printf("for debugging: %d, %d, %d", i, res[i+1], c[i+1]); //for debugging
+        for(int k = 0; k < 16; k++){
+            if(c[k] != res[k]){
+                printf("for debugging: %d, %d, %d", k, res[k + 1], c[k + 1]); //for debugging
                 return -1;
             }
         }
@@ -66,11 +66,11 @@ int sort2_test() {
     std::array<int, 32> c;
     //filling the arrays with random numbers between 0 and 99
     for (int i = 0; i < 100; i++) {
-        for (int i = 0; i < 16; i++) {
-            memory[i][0] = rand() % 100;
-            memory[i][1] = rand() % 100;
-            c[i*2] = memory[i][0];
-            c[i*2+1] = memory[i][1];
+        for (int j = 0; j < 16; j++) {
+            memory[j][0] = rand() % 100;
+            memory[j][1] = rand() % 100;
+            c[j * 2] = memory[j][0];
+            c[j * 2 + 1] = memory[j][1];
         }
 
         //sort them with the standard sort for checking if our own sort is working right
@@ -79,13 +79,13 @@ int sort2_test() {
         sort2<2, 32>(memory);
 
         //printing if something is incorrect
-        for(int i = 0; i < 16; i++){
-            if(c[i*2] != memory[i][0]){
-                printf("for debugging: %d, %d, %d", i, memory[i][0], c[i*2]); //for debugging
+        for(int k = 0; k < 16; k++){
+            if(c[k*2] != memory[k][0]){
+                printf("for debugging: %d, %d, %d, %d", i, k, memory[k][0], c[k*2]); //for debugging
                 return -1;
             }
-            if(c[i*2+1] != memory[i][1]){
-                printf("for debugging: %d, %d, %d", i, memory[i][1], c[i*2+1]); //for debugging
+            if(c[k*2+1] != memory[k][1]){
+                printf("for debugging: %d, %d, %d, %d", i, k, memory[k][1], c[k*2+1]); //for debugging
                 return -1;
             }
         }

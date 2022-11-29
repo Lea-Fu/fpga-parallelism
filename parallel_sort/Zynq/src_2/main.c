@@ -3,7 +3,7 @@
 #include <xil_io.h>
 #include <xil_cache.h>
 #include <stdio.h>
-//#include "platform.h"
+//#include "platform.h" //not needed when cache is turned off
 #include "xil_printf.h"
 #include <xtmrctr.h>
 
@@ -62,3 +62,6 @@ int main()
     //cleanup_platform();
     return 0;
 }
+
+//time for first sorting algo with 32 elements: 3980 nanoseconds
+//time for second sorting algo with 32 elements: 9670 nanoseconds

@@ -15,7 +15,8 @@ use of OpenMP.
 2. Vitis HLS
 
        1. Run C Synthesis
-       2. Export RTL Code
+       2. Export RTL Code (into ip_repo Directory from Vivado)
+          --> go into directiory and extract zip folder
 
 3. Vivado
 
@@ -28,6 +29,7 @@ use of OpenMP.
           --> Run Connection Automation --> Regenerate Layout --> save (ctrl+s)
           --> Validate design --> save (ctrl+s)
        4. Sources --> design_1 rightclick --> Create HDL Wrapper...
+       1.-4. if reloaded: Refresh IP Catalog --> Upgrade Selected
        5. Run Synthesis
        6. Run Implementation
        7. Generate Bitstream

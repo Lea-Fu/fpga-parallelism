@@ -17,7 +17,7 @@
 // Zynq 7020 | 106.400 | 53.200
 // 6         |         |
 // 16        |         |
-// 32        |  2.783  | 4.473
+// 32        |  9.879  | 15.731
 
 //needed because we need the log2 at compile time
 constexpr size_t log2 (size_t val) {
@@ -158,14 +158,12 @@ void sort2(arr_t<MemBusSize> *a) {
 #pragma HLS ARRAY_PARTITION variable=sorted complete dim=1
     //store each element in merge function
     for (int i = 0; i < SortSize/2; i++) {
-//#pragma HLS PIPELINE OFF
         arr_t<MemBusSize> input = a[i];
         sorted = merge<MemBusSize, SortSize>(input);
     }
 
     //write sorted result back into the memory
     for (int i = 0; i < SortSize/2; i++) {
-#pragma HLS PIPELINE OFF
         a[i][0] = sorted[i*2];//[log2(SortSize)];
         a[i][1] = sorted[i*2+1]; //[log2(SortSize)];
     }

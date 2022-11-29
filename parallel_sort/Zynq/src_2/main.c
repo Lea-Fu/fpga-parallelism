@@ -64,4 +64,4 @@ int main()
 }
 
 //time for first sorting algo with 32 elements: 3980 nanoseconds
-//time for second sorting algo with 32 elements: 9670 nanoseconds
+//time for second sorting algo with 32 elements: 8510 nanoseconds

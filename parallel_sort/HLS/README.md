@@ -29,7 +29,24 @@ use of OpenMP.
           --> Run Connection Automation --> Regenerate Layout --> save (ctrl+s)
           --> Validate design --> save (ctrl+s)
        4. Sources --> design_1 rightclick --> Create HDL Wrapper...
-       1.-4. if reloaded: Refresh IP Catalog --> Upgrade Selected
+       1.-4. 1. if reloaded: Refresh IP Catalog --> Upgrade Selected
+             2. in end design: remove debug logic analyzer
+                --> block design --> rightclick bug --> clear debug
+             3. in end design: rightclick design_1 --> Generate Output Products...
+                --> Synthesis Options --> Global --> Generate
+             4. (just necessary for sort_2) in end design:
+                [to get rid of the negative slack]
+                Tools --> Settings...
+                --> Synthesis --> Settings
+                     --> -directive* --> PerformanceOptimized
+                     --> -retiming* -->  checked
+                     --> Apply
+                --> Implementation --> Settings
+                     --> Place Design --> -directive* --> ExtraTimingOpt
+                     --> Post-Place Phys Opt Design --> -directive* -->  AlternateFlowWithRetiming
+                     --> Route Design --> -directive* --> MoreGlobalIterations
+                     --> Post-Route Phys Opt Design --> -directive* -->  AddRetime
+                     --> Apply
        5. Run Synthesis
        6. Run Implementation
        7. Generate Bitstream

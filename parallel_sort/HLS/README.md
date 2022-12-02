@@ -42,11 +42,13 @@ use of OpenMP.
                      --> -retiming* -->  checked
                      --> Apply
                 --> Implementation --> Settings
-                     --> Place Design --> -directive* --> ExtraTimingOpt
+                     --> Opt Design --> -directive* --> ExploreWithRemap
+                     --> Place Design --> -directive* --> ExtraNetDelay_high
                      --> Post-Place Phys Opt Design --> -directive* -->  AlternateFlowWithRetiming
-                     --> Route Design --> -directive* --> MoreGlobalIterations
+                     --> Route Design --> -directive* --> HigherDelayCost
                      --> Post-Route Phys Opt Design --> -directive* -->  AddRetime
                      --> Apply
+                (https://docs.xilinx.com/r/en-US/ug904-vivado-implementation/Using-Directives?tocId=tiGPVMrdHU~0e0pAOJjFJQ)
        5. Run Synthesis
        6. Run Implementation
        7. Generate Bitstream

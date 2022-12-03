@@ -9,6 +9,7 @@
 #include <cstdio>
 #include "sort_types.hpp"
 
+//sorting network bubblesort like
 
 //   size    | FF      | LUT
 // Zynq 7020 | 106.400 | 53.200

@@ -37,12 +37,11 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
 
 /**
  * function to merge the left and right part
+ *
  * @tparam MemBusSize size of the memory bus
  * @tparam SortSize size of the array to sort
- * @param sortLevels all levels of the pyramid
- * @param readyLeft true, when left side is ready
- * @param readyRight true, when right side is ready
- * @param level level that we are in (at the pyramid) to sort
+ * @param input the input array
+ * @return
  */
 template <int MemBusSize,int SortSize>
 arr_t<SortSize> merge(arr_t<MemBusSize> input) {
@@ -53,8 +52,8 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
 #pragma HLS RESET VARIABLE=sortLevels
 
     //readyFlag
-    static bool readyLeft[log2(SortSize) + 1] = {false};
-    static bool readyRight[log2(SortSize) + 1] = {false};
+    static bool readyLeft[log2(SortSize) + 1] = {false}; //true, when left side is ready
+    static bool readyRight[log2(SortSize) + 1] = {false}; //true, when right side is ready
 #pragma HLS RESET VARIABLE=readyLeft
 #pragma HLS RESET VARIABLE=readyRight
 
@@ -65,6 +64,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
     sortLevels[1][0] = input[1]; //right
     readyRight[0] = true;
 
+    //level (at the pyramid) to sort
     for (int level = 0; level < log2(SortSize); level++) {
 #pragma HLS PIPELINE
 
@@ -164,8 +164,8 @@ void sort2(arr_t<MemBusSize> *a) {
 
     //write sorted result back into the memory
     for (int i = 0; i < SortSize/2; i++) {
-        a[i][0] = sorted[i*2];//[log2(SortSize)];
-        a[i][1] = sorted[i*2+1]; //[log2(SortSize)];
+        a[i][0] = sorted[i*2];
+        a[i][1] = sorted[i*2+1];
     }
 }
 

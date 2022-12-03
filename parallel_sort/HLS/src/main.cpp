@@ -4,12 +4,14 @@
 #include <cstdlib>
 #include <algorithm>
 #include <array>
-#include <sys/time.h>
 #include <chrono>
 #include <iostream>
 
+/**
+ * Test for the first sorting implementation sort (a sorting network that works like bubblesort)
+ * @return if every element is sorted correctly or not
+ */
 int sort1_test() {
-    //clock_t t1 = clock();
     using namespace std::literals;
     const std::chrono::time_point<std::chrono::steady_clock> start =
             std::chrono::steady_clock::now();
@@ -40,12 +42,7 @@ int sort1_test() {
     printf("First sorting algo: everything is correct!\n");
 
     printf("total time taken by CPU:\n");
-    //clock_t t2 = clock();
     const auto end = std::chrono::steady_clock::now();
-    //long millisec = (t2 - t1) * (1000.0 / CLOCKS_PER_SEC);
-    //printf("Elapsed time: %lf milliseconds\n",
-    //       (((t2 - t1) * 1.0e3) + ((t2 - t1) / 1.0e6)));
-    //printf("time needed: %d milliseconds\n",millisec);
     std::cout
             << "Calculations took: "
             << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "µs = "
@@ -55,6 +52,10 @@ int sort1_test() {
     return 0;
 }
 
+/**
+ Test for the second sorting implementation sort2 (a bitonic mergesort)
+ * @return if every element is sorted correctly or not
+ */
 int sort2_test() {
 
     using namespace std::literals;
@@ -105,16 +106,18 @@ int sort2_test() {
 }
 
 /**
- * this is the main for testing if the sort algorithm is sorting the elements right
+ * this is the main for testing if the sort algorithms are both sorting the elements right
  * @return if every element is sorted correctly
  */
 int main(void) {
 
+    //sorting network (bubblesort like)
     int result = sort1_test();
     if (result) {
         return result;
     }
 
+    //bitonic mergesort
     result = sort2_test();
     if (result) {
         return result;

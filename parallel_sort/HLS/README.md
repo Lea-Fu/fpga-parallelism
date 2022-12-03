@@ -43,9 +43,11 @@ use of OpenMP.
                      --> Apply
                 --> Implementation --> Settings
                      --> Opt Design --> -directive* --> ExploreWithRemap
-                     --> Place Design --> -directive* --> ExtraNetDelay_high
+                     --> Place Design --> -directive* --> AltSpreadLogic_high
                      --> Post-Place Phys Opt Design --> -directive* -->  AlternateFlowWithRetiming
                      --> Route Design --> -directive* --> HigherDelayCost
+                     --> Post-Route Phys Opt Design --> is_enabled* -->  checked
+                     --> Post-Route Phys Opt Design --> tcl_post* -->  Path to AddRetime.tcl
                      --> Post-Route Phys Opt Design --> -directive* -->  AddRetime
                      --> Apply
                 (https://docs.xilinx.com/r/en-US/ug904-vivado-implementation/Using-Directives?tocId=tiGPVMrdHU~0e0pAOJjFJQ)

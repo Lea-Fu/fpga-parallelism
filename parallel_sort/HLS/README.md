@@ -45,7 +45,7 @@ use of OpenMP.
                      --> Opt Design --> -directive* --> ExploreWithRemap
                      --> Place Design --> -directive* --> AltSpreadLogic_high
                      --> Post-Place Phys Opt Design --> -directive* -->  AlternateFlowWithRetiming
-                     --> Route Design --> -directive* --> HigherDelayCost
+                     --> Route Design --> -directive* --> NoTimingRelaxation
                      --> Post-Route Phys Opt Design --> is_enabled* -->  checked
                      --> Post-Route Phys Opt Design --> tcl_post* -->  Path to AddRetime.tcl
                      --> Post-Route Phys Opt Design --> -directive* -->  AddRetime

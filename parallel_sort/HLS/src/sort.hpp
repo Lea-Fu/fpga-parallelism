@@ -39,7 +39,7 @@ arr_t<size> sort(arr_t<size> a){
     int tmp[2];
     for (int j = 0; j < size/2 ; j++) {
 #pragma HLS PIPELINE
-        //#pragma omp parallel for private(tmp) schedule(static, 16)
+        //#pragma omp parallel for private(tmp) //shared(a) default(none)
         for (int i = 0; i < size - 1; i+=2) {
             //printf("%d\n", omp_get_thread_num());
 #pragma HLS UNROLL
@@ -51,7 +51,7 @@ arr_t<size> sort(arr_t<size> a){
             }
         }
 #pragma HLS PIPELINE
-        //#pragma omp parallel for firstprivate(tmp)
+        //#pragma omp parallel for private(tmp) shared(a) num_threads(2)
         for (int i = 1; i < size - 2; i+=2) {
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
@@ -64,7 +64,7 @@ arr_t<size> sort(arr_t<size> a){
     }
 // this is not needed for the correct result, but for the correct pipelining of the hardware synthesis
 #pragma HLS PIPELINE
-    //#pragma omp parallel for firstprivate(tmp)
+    //#pragma omp parallel for private(tmp) shared(a) num_threads(2)
     for (int i = 0; i < size - 1; i += 2) {
 #pragma HLS UNROLL
         if (a[i] > a[i + 1]) {

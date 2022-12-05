@@ -7,6 +7,11 @@
 #include <chrono>
 #include <iostream>
 
+
+#define SORT_SIZE 4096
+#define HALF_SORT_SIZE (SORT_SIZE/2)
+
+
 /**
  * Test for the first sorting implementation sort (a sorting network that works like bubblesort)
  * @return if every element is sorted correctly or not
@@ -17,21 +22,21 @@ int sort1_test() {
             std::chrono::steady_clock::now();
 
     //create an arr_t (own type implemented in sort_types.h) and a standard array
-    arr_t<16> b;
-    std::array<int, 16> c;
+    arr_t<HALF_SORT_SIZE> b;
+    std::array<int, HALF_SORT_SIZE> c;
     //filling the arrays with random numbers between 0 and 99
-    for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 16; j++) {
+    for (int i = 0; i < 1; i++) {
+        for (int j = 0; j < HALF_SORT_SIZE; j++) {
             b[j] = rand() % 100;
             c[j] = b[j];
         }
         //sort them with the standard sort for checking if our own sort is working right
         std::sort(c.begin(),c.end());
         //sorting with our self-made sort algorithm
-        arr_t<16> res = sort(b);
+        arr_t<HALF_SORT_SIZE> res = sort(b);
 
         //printing if something is incorrect
-        for(int k = 0; k < 16; k++){
+        for(int k = 0; k < HALF_SORT_SIZE; k++){
             if(c[k] != res[k]){
                 printf("for debugging: %d, %d, %d", k, res[k + 1], c[k + 1]); //for debugging
                 return -1;
@@ -63,11 +68,11 @@ int sort2_test() {
             std::chrono::steady_clock::now();
 
     //create an arr_t (own type implemented in sort_types.h) and a standard array
-    arr_t<2> memory[16];
-    std::array<int, 32> c;
+    arr_t<2> memory[HALF_SORT_SIZE];
+    std::array<int, SORT_SIZE> c;
     //filling the arrays with random numbers between 0 and 99
-    for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 16; j++) {
+    for (int i = 0; i < 1; i++) {
+        for (int j = 0; j < HALF_SORT_SIZE; j++) {
             memory[j][0] = rand() % 100;
             memory[j][1] = rand() % 100;
             c[j * 2] = memory[j][0];
@@ -77,10 +82,10 @@ int sort2_test() {
         //sort them with the standard sort for checking if our own sort is working right
         std::sort(c.begin(),c.end());
         //sorting with our self-made sort algorithm
-        sort2<2, 32>(memory);
+        sort2<2, SORT_SIZE>(memory);
 
         //printing if something is incorrect
-        for(int k = 0; k < 16; k++){
+        for(int k = 0; k < HALF_SORT_SIZE; k++){
             if(c[k*2] != memory[k][0]){
                 printf("for debugging: %d, %d, %d, %d", i, k, memory[k][0], c[k*2]); //for debugging
                 return -1;

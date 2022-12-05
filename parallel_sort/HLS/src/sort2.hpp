@@ -86,6 +86,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
             int tmpBitonic1[SortSize];
             int tmpBitonic2[SortSize];
 
+//#pragma omp parallel num_threads(2) //for schedule
             for (int i = 0; i < mergeSize; i++) {
     #pragma HLS UNROLL
                 if (sortLevels[i][level] < sortLevels[mergeSize * 2 - i - 1][level]) {
@@ -102,7 +103,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
     #pragma HLS UNROLL
                     tmpBitonic1[m] = tmpBitonic2[m];
                 }
-
+//#pragma omp parallel num_threads(2)
                 for (int j = 0, o = 0; j < 2 << i; j++, o += n) {
     #pragma HLS UNROLL
                     for (int k = d, l = 0; k > 0; k--, l++) {

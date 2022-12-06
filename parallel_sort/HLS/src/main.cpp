@@ -8,7 +8,7 @@
 #include <iostream>
 
 
-#define WHOLE_SORT_SIZE (1 << 13) //8192
+#define WHOLE_SORT_SIZE (1 << 6) //64
 #define HALF_SORT_SIZE (WHOLE_SORT_SIZE/2)
 
 
@@ -25,7 +25,7 @@ int sort1_test() {
     arr_t<WHOLE_SORT_SIZE> b;
     std::array<int, WHOLE_SORT_SIZE> c;
     //filling the arrays with random numbers between 0 and 99
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 100; i++) {
         for (int j = 0; j < WHOLE_SORT_SIZE; j++) {
             b[j] = rand() % 100;
             c[j] = b[j];
@@ -50,9 +50,9 @@ int sort1_test() {
     const auto end = std::chrono::steady_clock::now();
     std::cout
             << "Calculations took: "
-            << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "µs = "
-            << (end - start) / 1ms << "ms = "
-            << (end - start) / 1s << "s.\n";
+            << (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count())/100 << "us = "
+            << (end - start)/100 / 1ms << "ms = "
+            << (end - start)/100 / 1s << "s.\n";
 
     return 0;
 }
@@ -71,7 +71,7 @@ int sort2_test() {
     arr_t<2> memory[HALF_SORT_SIZE];
     std::array<int, WHOLE_SORT_SIZE> c;
     //filling the arrays with random numbers between 0 and 99
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 100; i++) {
         for (int j = 0; j < HALF_SORT_SIZE; j++) {
             memory[j][0] = rand() % 100;
             memory[j][1] = rand() % 100;
@@ -103,9 +103,9 @@ int sort2_test() {
     const auto end = std::chrono::steady_clock::now();
     std::cout
             << "Calculations took: "
-            << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "µs = "
-            << (end - start) / 1ms << "ms = "
-            << (end - start) / 1s << "s.\n";
+            << (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count())/100 << "us = "
+            << (end - start)/100 / 1ms << "ms = "
+            << (end - start)/100 / 1s << "s.\n";
 
     return 0;
 }

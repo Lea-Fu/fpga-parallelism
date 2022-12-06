@@ -8,10 +8,10 @@ int main() {
     const auto start =
             std::chrono::steady_clock::now();
 
-       int a[16000];
-       int c[16000];
+       int a[100000];
+       int c[100000];
        for (int i = 0; i < 1; i++) {
-           for (int j = 0; j < 16000; j++) {
+           for (int j = 0; j < 100000; j++) {
                a[j] = rand() % 100;
                c[j] = a[j];
            }
@@ -19,8 +19,9 @@ int main() {
 
 
        int tmp[2];
-       int b[16000];
-   #pragma omp parallel for private(tmp), shared(a, b), default(none) //, num_threads(1) //#pragma omp parallel default(none) shared(a, size) private(tmp)
+       int b[100000];
+       /*
+   #pragma omp parallel for private(tmp), shared(a, b), default(none), num_threads(1) //#pragma omp parallel default(none) shared(a, size) private(tmp)
        for (int i = 0; i < 1000 - 1; i += 2) {
            if (a[i*16] > a[i*16 + 1]) {
                tmp[0] = a[i*16 + 1];
@@ -31,7 +32,27 @@ int main() {
            }
            //printf("%d",b[i]);
        }
+*/
 
+       int size = 40000;
+
+        for(int i = 0; i < size-1; i++ ) {
+            int first = i % 2;
+    #pragma omp parallel for default(none),shared(a,first,size) num_threads(6)
+    //without OpenMP: 2ms:1000 elements   328ms:16000 elements   842ms:25000 elements   1430ms:32000 elements   2306ms:40000 elements
+    //with OpenMP:    23ms:1000 elements  456ms:16000 elements   793ms:25000 elements   1123ms:32000 elements   1531ms:40000 elements
+            for(int j = first; j < size-1; j+=2) {
+                if(a[j] > a[j+1]) {
+                    int tmp = a[j];
+                    a[j] = a[j+1];
+                    a[j+1] = tmp;
+                }
+            }
+        }
+
+        /*for(int i = 0; i < size; i++) {
+            std::cout << a[i] << std::endl;
+        }*/
 
        const auto end = std::chrono::steady_clock::now();
        std::cout

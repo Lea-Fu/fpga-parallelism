@@ -17,7 +17,7 @@
 // 16        | 4.618   | 10.555
 // 32        | 17.426  | 42.077
 
-#define SORT_SIZE 2048
+#define SORT_SIZE 32
 void top_level_sort(int* memory); //used for the hardware synthesis/ component
 
 //because this function needs a template, it can't be in the cpp file
@@ -37,11 +37,10 @@ arr_t<size> sort(arr_t<size> a){
     //printf("%d\n", omp_get_max_threads( ));
     //printf("%d\n", omp_get_num_procs( ));
     int tmp[2];
-    int b = size;
-    for (int j = 0; j < b/2 ; j++) {
+    for (int j = 0; j < size/2 ; j++) {
 #pragma HLS PIPELINE
-        //#pragma omp parallel for private(tmp),shared(a, b),default(none) //#pragma omp parallel default(none) shared(a, size) private(tmp)
-        for (int i = 0; i < b - 1; i+=2) {
+        #pragma omp parallel for private(tmp),shared(a),default(none) num_threads(6)  // just comment this in, when you want to sort more than > 10000 elements (otherwise the timing is better without the use of openMP)
+        for (int i = 0; i < size - 1; i+=2) {
             //printf("%d\n", omp_get_thread_num());
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
@@ -52,8 +51,8 @@ arr_t<size> sort(arr_t<size> a){
             }
         }
 #pragma HLS PIPELINE
-        //#pragma omp parallel for default(none),shared(a, b),private(tmp)//#pragma omp parallel for private(tmp) shared(a) num_threads(2)
-        for (int i = 1; i < b - 2; i+=2) {
+        #pragma omp parallel for default(none),shared(a),private(tmp) num_threads(6)  // just comment this in, when you want to sort more than > 10000 elements (otherwise the timing is better without the use of openMP)
+        for (int i = 1; i < size - 2; i+=2) {
 #pragma HLS UNROLL
             if (a[i] > a[i + 1]) {
                 tmp[0] = a[i + 1];
@@ -65,8 +64,8 @@ arr_t<size> sort(arr_t<size> a){
     }
 // this is not needed for the correct result, but for the correct pipelining of the hardware synthesis
 #pragma HLS PIPELINE
-    //#pragma omp parallel for default(none),shared(a, b),private(tmp)
-    for (int i = 0; i < b - 1; i += 2) {
+    #pragma omp parallel for default(none),shared(a),private(tmp)  num_threads(6)  // just comment this in, when you want to sort more than > 10000 elements (otherwise the timing is better without the use of openMP)
+    for (int i = 0; i < size - 1; i += 2) {
 #pragma HLS UNROLL
         if (a[i] > a[i + 1]) {
             tmp[0] = a[i + 1];

@@ -32,7 +32,7 @@ constexpr size_t log2 (size_t val) {
 }
 
 #define MEM_BUS_SIZE 2
-#define SORT_SIZE 2048
+#define SORT_SIZE 32
 void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synthesis/ component
 
 /**
@@ -86,7 +86,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
             int tmpBitonic1[SortSize];
             int tmpBitonic2[SortSize];
 
-//#pragma omp parallel num_threads(2) //for schedule
+            //#pragma omp parallel for default(none),shared(sortLevels, level, tmpBitonic2, mergeSize) num_threads(6)
             for (int i = 0; i < mergeSize; i++) {
     #pragma HLS UNROLL
                 if (sortLevels[i][level] < sortLevels[mergeSize * 2 - i - 1][level]) {
@@ -99,14 +99,16 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
             }
 
             for (int i = 0, d = mergeSize / 2, n = mergeSize; i < level; i++, n /= 2, d /= 2) {
+            //#pragma omp parallel for default(none),shared(tmpBitonic1, tmpBitonic2, mergeSize) num_threads(6)
                 for (int m = 0; m < mergeSize * 2; m++) {
     #pragma HLS UNROLL
                     tmpBitonic1[m] = tmpBitonic2[m];
                 }
-//#pragma omp parallel num_threads(2)
-                for (int j = 0, o = 0; j < 2 << i; j++, o += n) {
+            //#pragma omp parallel for default(none),shared(tmpBitonic1, tmpBitonic2, d, i, n) num_threads(6) collapse(2)
+                for (int j = 0; j < 2 << i; j++) {
     #pragma HLS UNROLL
-                    for (int k = d, l = 0; k > 0; k--, l++) {
+                    for (int l = 0; l < d; l++) {
+                        int o = j*n;
     #pragma HLS UNROLL
                         if (tmpBitonic1[o + l] < tmpBitonic1[o + l + d]) {
                             tmpBitonic2[o + l] = tmpBitonic1[o + l];
@@ -119,6 +121,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
                 }
             }
 
+        //#pragma omp parallel for default(none),shared(sortLevels, level, tmpBitonic2, mergeSize, dest) num_threads(6)
             for (int i = 0; i < mergeSize * 2; i++) {
     #pragma HLS UNROLL
                 sortLevels[dest + i][level + 1] = tmpBitonic2[i];
@@ -130,6 +133,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
         }
     }
 
+        //#pragma omp parallel for default(none),shared(sortLevels, sorted) num_threads(6)
     for (int i = 0; i < SortSize; i++) {
         sorted[i] = sortLevels[i][log2(SortSize)];
     }
@@ -145,7 +149,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
  * self-made second sorting algorithm that sorts in a merge sort fashion
  *
  * #pragma HLS is needed for the hardware synthesis (so later on FPGA),
- * #pragma omp is needed for paralleling with OpenMP (so later for CPU and Raspberry Pi) TODO
+ * #pragma omp is needed for paralleling with OpenMP (so later for CPU and Raspberry Pi)
  *
  * @tparam MemBusSize size of the memory bus
  * @tparam SortSize size of the array to sort

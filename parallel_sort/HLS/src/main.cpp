@@ -8,7 +8,7 @@
 #include <iostream>
 
 
-#define WHOLE_SORT_SIZE 2048
+#define WHOLE_SORT_SIZE (1 << 16) //65536
 #define HALF_SORT_SIZE (WHOLE_SORT_SIZE/2)
 
 

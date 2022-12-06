@@ -13,11 +13,11 @@ struct arr_t {
 #if defined __has_include
 #  if __has_include (<omp.h>)
 #    include <omp.h>
-    int a[size*8]; // pad every element (4 byte) with 60 additional bytes to prevent cache thrashing with openMP
+    int a[size*16]; // pad every element (4 byte) with 60 additional bytes to prevent cache thrashing with openMP
 
     // Overloading [] operator to access elements in array style
     int& operator[](int i){
-        return a[i*8+(i%2)]; // to just access the real elements which are padded, so we need
+        return a[i*16+(i%2)]; // to just access the real elements which are padded, so we need
         // 0 = 0, 1 = 16, 2 = 32 ...
     }
 

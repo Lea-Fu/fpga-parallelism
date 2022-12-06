@@ -32,7 +32,7 @@ constexpr size_t log2 (size_t val) {
 }
 
 #define MEM_BUS_SIZE 2
-#define SORT_SIZE 32
+#define SORT_SIZE 2048
 void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synthesis/ component
 
 /**

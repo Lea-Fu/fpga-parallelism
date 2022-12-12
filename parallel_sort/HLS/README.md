@@ -25,8 +25,10 @@ use of OpenMP.
 
 2. Vitis HLS
 
-       1. Run C Synthesis
-       2. Export RTL Code (into ip_repo Directory from Vivado)
+       1. change TopLevelFunction: 
+          Project --> Project Settings... --> Synthesis --> Top Function --> Browse... --> top_level_sort(2) --> ok
+       2. Run C Synthesis
+       3. Export RTL Code (into ip_repo Directory from Vivado)
           --> go into directiory and extract zip folder
 
 3. Vivado

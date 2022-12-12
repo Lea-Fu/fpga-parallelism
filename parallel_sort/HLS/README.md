@@ -6,11 +6,22 @@ use of OpenMP.
 
 ***
 
-**How To Use:**
+# **How To Use:**
 
 1. Clion or other IDE for
    
        1. C/C++ Code for CPU (implies Raspberry Pi) and FPGA
+
+
+### _Raspberry Pi_:
+
+2. Install CMake on Pi (https://lindevs.com/install-cmake-on-raspberry-pi/)
+3. when you change code on the pi, rerun ```make``` and ```./fpga-parallelism``` every time
+4. bigger stack: ```ulimit -s unlimited```
+
+
+
+### _FPGA_:
 
 2. Vitis HLS
 

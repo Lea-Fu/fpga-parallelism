@@ -75,6 +75,9 @@ use of OpenMP.
        1. File --> New --> Application Project... --> Add
           --> Create new platform from hardware (XSA) --> Browse...
           --> Empty Application(C) --> write Code for FPGA here
+               if reloaded: 
+               1. rightclick design_1_wrapper --> Update Hardware Specification --> ok
+               2. hammer symbol(Build 'Configuration' for project 'design_1_wrapper')
        2. Modify BSP Settings... --> standalone --> stdin --> ps7_uart_1
          --> stdout --> ps7_uart_1
        3. Playbutton --> Run Configurations... --> Single Application Debug --> Target Setup

@@ -42,7 +42,7 @@ use of OpenMP.
           --> Run Connection Automation --> Regenerate Layout --> save (ctrl+s)
           --> Validate design --> save (ctrl+s)
        4. Sources --> design_1 rightclick --> Create HDL Wrapper...
-       1.-4. 1. if reloaded: Refresh IP Catalog --> Upgrade Selected
+       1.-4. 1. if reloaded: Refresh IP Catalog --> Report IP Status --> Upgrade Selected
              2. in end design: remove debug logic analyzer
                 --> block design --> rightclick bug --> clear debug
              3. in end design: rightclick design_1 --> Generate Output Products...

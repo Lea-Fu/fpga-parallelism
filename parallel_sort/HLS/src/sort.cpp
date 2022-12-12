@@ -2,7 +2,7 @@
 
 
 //this is needed because of the hardware synthesis, that needs a defined top level function without a template
-void top_level_sort(int* memory){
+void top_level_sort(int *memory) {
 #pragma HLS interface s_axilite port=return bundle=CONTROL //needed for control signals in axilite port
 #pragma HLS interface m_axi port=memory //axi master port to main memory
 

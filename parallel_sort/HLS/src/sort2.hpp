@@ -3,9 +3,12 @@
 
 #if defined __has_include
 #  if __has_include (<omp.h>)
+
 #    include <omp.h>
+
 #  endif
 #endif
+
 #include <cstdio>
 #include "sort_types.hpp"
 #include <limits.h>
@@ -15,12 +18,11 @@
 
 //   size    | FF      | LUT
 // Zynq 7020 | 106.400 | 53.200
-// 6         |         |
-// 16        |         |
+// 16        |  5.592  |  8.399
 // 32        |  9.879  | 15.731
 
 //needed because we need the log2 at compile time
-constexpr size_t log2 (size_t val) {
+constexpr size_t log2(size_t val) {
     if (val == 0) return UINT_MAX;
     if (val == 1) return 0;
     unsigned int res = 0;
@@ -33,7 +35,8 @@ constexpr size_t log2 (size_t val) {
 
 #define MEM_BUS_SIZE 2
 #define SORT_SIZE 32
-void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synthesis/ component
+
+void top_level_sort2(arr_t<MEM_BUS_SIZE> *memory); //used for the hardware synthesis/ component
 
 /**
  * function to merge the left and right part
@@ -43,7 +46,7 @@ void top_level_sort2(arr_t<MEM_BUS_SIZE>* memory); //used for the hardware synth
  * @param input the input array
  * @return
  */
-template <int MemBusSize,int SortSize>
+template<int MemBusSize, int SortSize>
 arr_t<SortSize> merge(arr_t<MemBusSize> input) {
 #pragma HLS PIPELINE
 
@@ -88,7 +91,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
 
             //#pragma omp parallel for default(none),shared(sortLevels, level, tmpBitonic2, mergeSize) num_threads(6)
             for (int i = 0; i < mergeSize; i++) {
-    #pragma HLS UNROLL
+#pragma HLS UNROLL
                 if (sortLevels[i][level] < sortLevels[mergeSize * 2 - i - 1][level]) {
                     tmpBitonic2[i] = sortLevels[i][level];
                     tmpBitonic2[mergeSize * 2 - i - 1] = sortLevels[mergeSize * 2 - i - 1][level];
@@ -99,17 +102,17 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
             }
 
             for (int i = 0, d = mergeSize / 2, n = mergeSize; i < level; i++, n /= 2, d /= 2) {
-            //#pragma omp parallel for default(none),shared(tmpBitonic1, tmpBitonic2, mergeSize) num_threads(6)
+                //#pragma omp parallel for default(none),shared(tmpBitonic1, tmpBitonic2, mergeSize) num_threads(6)
                 for (int m = 0; m < mergeSize * 2; m++) {
-    #pragma HLS UNROLL
+#pragma HLS UNROLL
                     tmpBitonic1[m] = tmpBitonic2[m];
                 }
-            //#pragma omp parallel for default(none),shared(tmpBitonic1, tmpBitonic2, d, i, n) num_threads(6) collapse(2)
+                //#pragma omp parallel for default(none),shared(tmpBitonic1, tmpBitonic2, d, i, n) num_threads(6) collapse(2)
                 for (int j = 0; j < 2 << i; j++) {
-    #pragma HLS UNROLL
+#pragma HLS UNROLL
                     for (int l = 0; l < d; l++) {
-                        int o = j*n;
-    #pragma HLS UNROLL
+                        int o = j * n;
+#pragma HLS UNROLL
                         if (tmpBitonic1[o + l] < tmpBitonic1[o + l + d]) {
                             tmpBitonic2[o + l] = tmpBitonic1[o + l];
                             tmpBitonic2[o + l + d] = tmpBitonic1[o + l + d];
@@ -121,9 +124,9 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
                 }
             }
 
-        //#pragma omp parallel for default(none),shared(sortLevels, level, tmpBitonic2, mergeSize, dest) num_threads(6)
+            //#pragma omp parallel for default(none),shared(sortLevels, level, tmpBitonic2, mergeSize, dest) num_threads(6)
             for (int i = 0; i < mergeSize * 2; i++) {
-    #pragma HLS UNROLL
+#pragma HLS UNROLL
                 sortLevels[dest + i][level + 1] = tmpBitonic2[i];
             }
 
@@ -133,7 +136,7 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
         }
     }
 
-        //#pragma omp parallel for default(none),shared(sortLevels, sorted) num_threads(6)
+    //#pragma omp parallel for default(none),shared(sortLevels, sorted) num_threads(6)
     for (int i = 0; i < SortSize; i++) {
         sorted[i] = sortLevels[i][log2(SortSize)];
     }
@@ -155,22 +158,22 @@ arr_t<SortSize> merge(arr_t<MemBusSize> input) {
  * @tparam SortSize size of the array to sort
  * @param a the input array
  */
-template <int MemBusSize,int SortSize>
+template<int MemBusSize, int SortSize>
 void sort2(arr_t<MemBusSize> *a) {
 #pragma HLS DATAFLOW
 
     arr_t<SortSize> sorted;
 #pragma HLS ARRAY_PARTITION variable=sorted complete dim=1
     //store each element in merge function
-    for (int i = 0; i < SortSize/2; i++) {
+    for (int i = 0; i < SortSize / 2; i++) {
         arr_t<MemBusSize> input = a[i];
         sorted = merge<MemBusSize, SortSize>(input);
     }
 
     //write sorted result back into the memory
-    for (int i = 0; i < SortSize/2; i++) {
-        a[i][0] = sorted[i*2];
-        a[i][1] = sorted[i*2+1];
+    for (int i = 0; i < SortSize / 2; i++) {
+        a[i][0] = sorted[i * 2];
+        a[i][1] = sorted[i * 2 + 1];
     }
 }
 

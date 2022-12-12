@@ -8,7 +8,7 @@
 #include <iostream>
 
 
-#define WHOLE_SORT_SIZE (1 << 6) //64
+#define WHOLE_SORT_SIZE (1 << 5) //32
 #define HALF_SORT_SIZE (WHOLE_SORT_SIZE/2)
 
 
@@ -31,13 +31,13 @@ int sort1_test() {
             c[j] = b[j];
         }
         //sort them with the standard sort for checking if our own sort is working right
-        std::sort(c.begin(),c.end());
+        std::sort(c.begin(), c.end());
         //sorting with our self-made sort algorithm
         arr_t<WHOLE_SORT_SIZE> res = sort(b);
 
         //printing if something is incorrect
-        for(int k = 0; k < WHOLE_SORT_SIZE; k++){
-            if(c[k] != res[k]){
+        for (int k = 0; k < WHOLE_SORT_SIZE; k++) {
+            if (c[k] != res[k]) {
                 printf("for debugging: %d, %d, %d", k, res[k + 1], c[k + 1]); //for debugging
                 return -1;
             }
@@ -50,9 +50,9 @@ int sort1_test() {
     const auto end = std::chrono::steady_clock::now();
     std::cout
             << "Calculations took: "
-            << (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count())/100 << "us = "
-            << (end - start)/100 / 1ms << "ms = "
-            << (end - start)/100 / 1s << "s.\n";
+            << (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) / 100 << "us = "
+            << (end - start) / 100 / 1ms << "ms = "
+            << (end - start) / 100 / 1s << "s.\n";
 
     return 0;
 }
@@ -80,18 +80,18 @@ int sort2_test() {
         }
 
         //sort them with the standard sort for checking if our own sort is working right
-        std::sort(c.begin(),c.end());
+        std::sort(c.begin(), c.end());
         //sorting with our self-made sort algorithm
         sort2<2, WHOLE_SORT_SIZE>(memory);
 
         //printing if something is incorrect
-        for(int k = 0; k < HALF_SORT_SIZE; k++){
-            if(c[k*2] != memory[k][0]){
-                printf("for debugging: %d, %d, %d, %d", i, k, memory[k][0], c[k*2]); //for debugging
+        for (int k = 0; k < HALF_SORT_SIZE; k++) {
+            if (c[k * 2] != memory[k][0]) {
+                printf("for debugging: %d, %d, %d, %d", i, k, memory[k][0], c[k * 2]); //for debugging
                 return -1;
             }
-            if(c[k*2+1] != memory[k][1]){
-                printf("for debugging: %d, %d, %d, %d", i, k, memory[k][1], c[k*2+1]); //for debugging
+            if (c[k * 2 + 1] != memory[k][1]) {
+                printf("for debugging: %d, %d, %d, %d", i, k, memory[k][1], c[k * 2 + 1]); //for debugging
                 return -1;
             }
         }
@@ -103,9 +103,9 @@ int sort2_test() {
     const auto end = std::chrono::steady_clock::now();
     std::cout
             << "Calculations took: "
-            << (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count())/100 << "us = "
-            << (end - start)/100 / 1ms << "ms = "
-            << (end - start)/100 / 1s << "s.\n";
+            << (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) / 100 << "us = "
+            << (end - start) / 100 / 1ms << "ms = "
+            << (end - start) / 100 / 1s << "s.\n";
 
     return 0;
 }

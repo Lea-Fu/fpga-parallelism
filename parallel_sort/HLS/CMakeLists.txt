@@ -4,7 +4,7 @@ project(fpga-parallelism)
 # added -fopenmp
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp")
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,100000000") #needed to make the stack bigger, so that we can test sorting with more elements to test paralleling with OpenMP
-# "-stack_size" --> needed for MacOs "--stack" needed for Windows
+# "-stack_size" --> needed for MacOs, "--stack" needed for Windows, "ulimit -s unlimited" needed for Raspberry Pi (in Terminal)
 
 set(CMAKE_CXX_STANDARD 17)
 include_directories(include)

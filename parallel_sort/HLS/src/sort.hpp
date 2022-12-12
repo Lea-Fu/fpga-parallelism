@@ -33,6 +33,7 @@ void top_level_sort(int* memory); //used for the hardware synthesis/ component
  */
 template <int size>
 arr_t<size> sort(arr_t<size> a){
+#pragma HLS ARRAY_PARTITION variable=a.a complete dim=1
 
     //printf("%d\n", omp_get_max_threads( ));
     //printf("%d\n", omp_get_num_procs( ));
@@ -61,19 +62,9 @@ arr_t<size> sort(arr_t<size> a){
                 a[i + 1] = tmp[1];
             }
         }
-    }/* commented out for time measurements on CPU
-// this is not needed for the correct result, but for the correct pipelining of the hardware synthesis
+    }
+
 #pragma HLS PIPELINE
-    //#pragma omp parallel for default(none),shared(a),private(tmp)  num_threads(2)  // just comment this in, when you want to sort more than > 10000 elements (otherwise the timing is better without the use of openMP)
-    for (int i = 0; i < size - 1; i += 2) {
-#pragma HLS UNROLL
-        if (a[i] > a[i + 1]) {
-            tmp[0] = a[i + 1];
-            tmp[1] = a[i];
-            a[i] = tmp[0];
-            a[i + 1] = tmp[1];
-        }
-    }*/
     return a;
 }
 

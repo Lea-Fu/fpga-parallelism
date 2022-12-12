@@ -42,7 +42,7 @@ use of OpenMP.
           --> Run Connection Automation --> Regenerate Layout --> save (ctrl+s)
           --> Validate design --> save (ctrl+s)
        4. Sources --> design_1 rightclick --> Create HDL Wrapper...
-       1.-4. 1. if reloaded: Refresh IP Catalog --> Upgrade Selected
+       1.-4. 1. if reloaded: Refresh IP Catalog --> Report IP Status --> Upgrade Selected
              2. in end design: remove debug logic analyzer
                 --> block design --> rightclick bug --> clear debug
              3. in end design: rightclick design_1 --> Generate Output Products...
@@ -75,6 +75,9 @@ use of OpenMP.
        1. File --> New --> Application Project... --> Add
           --> Create new platform from hardware (XSA) --> Browse...
           --> Empty Application(C) --> write Code for FPGA here
+               if reloaded: 
+               1. rightclick design_1_wrapper --> Update Hardware Specification --> ok
+               2. hammer symbol(Build 'Configuration' for project 'design_1_wrapper')
        2. Modify BSP Settings... --> standalone --> stdin --> ps7_uart_1
          --> stdout --> ps7_uart_1
        3. Playbutton --> Run Configurations... --> Single Application Debug --> Target Setup

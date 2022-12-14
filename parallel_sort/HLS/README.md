@@ -47,8 +47,7 @@ use of OpenMP.
                 --> block design --> rightclick bug --> clear debug
              3. in end design: rightclick design_1 --> Generate Output Products...
                 --> Synthesis Options --> Global --> Generate
-             4. (just necessary for sort_2) in end design:
-                [to get rid of the negative slack]
+             4. in end design: [to get rid of the negative slack]
                 Tools --> Settings...
                 --> Synthesis --> Settings
                      --> -directive* --> PerformanceOptimized

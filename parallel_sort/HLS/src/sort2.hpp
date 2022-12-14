@@ -20,6 +20,8 @@
 // Zynq 7020 | 106.400 | 53.200
 // 16        |  5.592  |  8.399
 // 32        |  9.879  | 15.731
+// 64        | 18.277  | 32.147
+//128        | 41.109  | 72.314 <-- not possible, because it is more, than the FPGA (Zynq 7020) has --> in vivado after synthesis: 41.731 | 61.348
 
 //needed because we need the log2 at compile time
 constexpr size_t log2(size_t val) {

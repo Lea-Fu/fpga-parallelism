@@ -18,6 +18,7 @@
 // Zynq 7020 | 106.400 | 53.200
 // 16        | 6.339   | 12.159
 // 32        | 19.551  | 43.289
+// 64        | 70.803  | 168.605 <-- not possible, because it is more, than the FPGA (Zynq 7020) has
 
 #define SORT_SIZE 32
 
